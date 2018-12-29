@@ -11,16 +11,10 @@ import java.util.List;
 public class moraUtil {
     private static String BASE_URL = "https://cf.mora.jp/contents/package/%04d/%08d/%04d/%03d/%03d/packageMeta.json";
 
+    public static int maxpno;
+
     public static void setBaseUrl(String baseUrl) {
         BASE_URL = baseUrl;
-    }
-
-    public static List<String> getUrlList(int labelId, int materialNo , int num) {
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            list.add(getPackageUrl(labelId, materialNo + i));
-        }
-        return list;
     }
 
     public static String getPackageUrl(int mountPoint, int labelId, int materialNo) {
@@ -31,13 +25,18 @@ public class moraUtil {
         return getPackageUrl(0, labelId, materialNo);
     }
 
-    public static String[] getMateriaNo(String url){
-        log.info(new Gson().toJson(url.split("/")));
-        return null;
+    public static int getMateriaNo(String url) {
+        String[] strs = url.split("/");
+        return Integer.parseInt(strs[7]+strs[8]+strs[9]);
+    }
+
+    public static int maxpno(int pno) {
+        if (maxpno < pno) maxpno = pno;
+        return maxpno;
     }
 
     @Test
-    public void test(){
+    public void test() {
         getMateriaNo("https://cf.mora.jp/contents/package/0000/00000031/0012/876/924/packageMeta.json");
     }
 }

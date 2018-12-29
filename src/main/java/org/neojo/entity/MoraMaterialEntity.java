@@ -978,4 +978,9 @@ public class MoraMaterialEntity {
     public int hashCode() {
         return Objects.hash(materialNo, subMaterialNo, arranger, arrangerKana, artistName, artistNameKana, artistNameNo, artistNo, bannerimage0, bannerimage1, bannerimage2, bannerimage3, bannerLinkUrl0, bannerLinkUrl1, bannerLinkUrl2, bannerLinkUrl3, bannerTargetBlank0, bannerTargetBlank1, bannerTargetBlank2, bannerTargetBlank3, bitPerSample, callCoupon, catchcopy, cdPartNo, channelConf, comingSoon, composer, composerKana, containCoupon, couponProduct, dispFlg, displayLabelname, dispStartDate, dispStartDateStr, distFlg, distPartNo, duration, durationStr, endDate, fullsizeimage, labelCode, labelcompanyname, labelId, labelname, listenDuration, listenFlg, listimage, lyrics, lyricsKana, master, mediaFlg, mediaFormatNo, mediaType, metaDescription, msin, musicComment, musicId, musicType, packageComment, packageId, packageimage, packageUrl, prFlg, price, priceWithoutTax, producer, producerKana, productTypeNo, samplingFreq, special, specialPageUrl, startDate, tid, tie, tieType, title, titleKana, trackNo, weblistsizeimage, relatedmaterialNo);
     }
+
+    @Override
+    public String toString() {
+        return "[" + this.artistName + " - " + this.title + "] : " + this.startDate;
+    }
 }
