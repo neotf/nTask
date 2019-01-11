@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.github.biezhi.request.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.neojo.entity.MoraMaterialEntity;
+import org.neojo.response.MoraResponse;
 import org.neojo.scheduler.MoraScheduler;
 import org.neojo.util.CommonUtils;
 import org.neojo.util.MoraUtil;
@@ -32,8 +33,11 @@ public class MoraDownloader implements Runnable {
             Request req = httpReq.connectTimeout(60_000).readTimeout(60_000);
             int code = req.code();
             if (code == 200) {
-                MoraMaterialEntity m = new Gson().fromJson(req.reader(), MoraMaterialEntity.class);
-                log.info("HTTP-{} - [{}] : {}", code, mNo, m.getTitle());
+                log.info("HTTP-{} - [{}] : {}", code, mNo);
+                req.reader();
+
+                MoraResponse mr = new MoraResponse(code, mNo, req.stream(), req.charset());
+                ms.addResponse(mr);
             } else {
                 log.debug("HTTP-{} - [{}]", code, mNo);
             }
