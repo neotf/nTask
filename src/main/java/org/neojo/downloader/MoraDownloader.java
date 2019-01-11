@@ -5,9 +5,8 @@ import io.github.biezhi.request.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.neojo.entity.MoraMaterialEntity;
 import org.neojo.scheduler.MoraScheduler;
+import org.neojo.util.CommonUtils;
 import org.neojo.util.MoraUtil;
-
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class MoraDownloader implements Runnable {
@@ -23,11 +22,11 @@ public class MoraDownloader implements Runnable {
     @Override
     public void run() {
         log.info("Start");
-        sleep(1000L);
+        CommonUtils.sleep(1000L);
         while (isRunning) {
             int mNo = ms.getNo();
             if (ms.getMax() < mNo) {
-                sleep(1000L);
+                CommonUtils.sleep(1000L);
             }
             Request httpReq = Request.get(MoraUtil.getPackageUrl(label, mNo));
             Request req = httpReq.connectTimeout(60_000).readTimeout(60_000);
@@ -38,15 +37,7 @@ public class MoraDownloader implements Runnable {
             } else {
                 log.debug("HTTP-{} - [{}]", code, mNo);
             }
-            sleep(500L);
-        }
-    }
-
-    private void sleep(long time) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            CommonUtils.sleep(500L);
         }
     }
 }
