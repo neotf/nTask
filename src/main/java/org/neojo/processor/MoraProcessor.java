@@ -1,19 +1,11 @@
 package org.neojo.processor;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-import io.github.biezhi.elves.request.Request;
-import io.github.biezhi.elves.response.Response;
-import io.github.biezhi.elves.response.Result;
+
 import lombok.extern.slf4j.Slf4j;
 import org.neojo.downloader.MoraDownloader;
-import org.neojo.entity.MoraMaterialEntity;
 import org.neojo.scheduler.MoraScheduler;
-import org.neojo.util.MoraUtil;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.*;
 
 @Slf4j
