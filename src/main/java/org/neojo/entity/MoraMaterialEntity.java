@@ -1,6 +1,7 @@
 package org.neojo.entity;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -56,7 +57,7 @@ public class MoraMaterialEntity {
     private String lyrics;
     private String lyricsKana;
     private String master;
-    private String mediaFlg;
+    private Integer mediaFlg;
     private Integer mediaFormatNo;
     private Integer mediaType;
     private String metaDescription;
@@ -86,6 +87,7 @@ public class MoraMaterialEntity {
     private Integer trackNo;
     private String weblistsizeimage;
     private Integer relatedmaterialNo;
+    private List<MoraMaterialEntity> trackList;
 
     @Id
     @Column(name = "materialNo")
@@ -589,11 +591,11 @@ public class MoraMaterialEntity {
 
     @Basic
     @Column(name = "mediaFlg")
-    public String getMediaFlg() {
+    public Integer getMediaFlg() {
         return mediaFlg;
     }
 
-    public void setMediaFlg(String mediaFlg) {
+    public void setMediaFlg(Integer mediaFlg) {
         this.mediaFlg = mediaFlg;
     }
 

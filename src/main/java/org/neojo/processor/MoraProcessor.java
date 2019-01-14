@@ -10,10 +10,13 @@ import org.neojo.entity.MoraMaterialEntity;
 import org.neojo.response.MoraResponse;
 import org.neojo.scheduler.MoraScheduler;
 import org.neojo.util.CommonUtils;
+import org.neojo.util.MoraUtil;
 
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.*;
 
 /**
@@ -28,6 +31,9 @@ public class MoraProcessor {
     private final int label;
     private int no;
     private boolean running = true;
+
+    private SimpleDateFormat frsdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private SimpleDateFormat tosdf = new SimpleDateFormat("yyMMdd");
 
     private MoraProcessor(int label, int no, int threads) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Mora-Catch-%02d").build();
@@ -49,7 +55,15 @@ public class MoraProcessor {
             MoraResponse res = ms.nextResponse();
             InputStreamReader reader = new InputStreamReader(res.getIs(), Charset.forName(res.getCharset()));
             MoraMaterialEntity me = new Gson().fromJson(reader, MoraMaterialEntity.class);
-            log.info("[{}] : {}", res.getId(), me.getTitle());
+            try {
+                Integer mediaFormatNo = me.getMediaFormatNo();
+                log.info("[{}] : {}[{}] {} - {} {}", res.getId(),
+                        (mediaFormatNo==12||mediaFormatNo==13)?"[Hi-Res]":"",
+                        tosdf.format(frsdf.parse(me.getDispStartDate())),
+                        me.getArtistName(), me.getTitle(),  MoraUtil.getMediaFormat(me));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 
