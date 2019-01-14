@@ -2,29 +2,22 @@ package org.neojo.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.neojo.response.MoraResponse;
+import org.neojo.util.CommonUtils;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public class MoraScheduler {
-    private BlockingQueue<MoraResponse> result  = new LinkedBlockingQueue<>();
+    private BlockingQueue<MoraResponse> result = new LinkedBlockingQueue<>();
     private final int label;
     private int no;
     private int max;
 
-    public MoraScheduler(int label,int no) {
+    public MoraScheduler(int label, int no) {
         this.label = label;
         this.no = no;
-        this.max = no + 100000;
-    }
-
-    public int getLabel() {
-        return label;
-    }
-
-    public int max() {
-        return max;
+        this.max = no + 100_000;
     }
 
     public synchronized int max(int no) {
@@ -36,6 +29,22 @@ public class MoraScheduler {
 
     public synchronized int no() {
         return no++;
+    }
+
+    public void full(){
+        no--;
+    }
+
+    public int getLabel() {
+        return label;
+    }
+
+    public int getNo() {
+        return no;
+    }
+
+    public int getMax() {
+        return max;
     }
 
     public void addResponse(MoraResponse response) {

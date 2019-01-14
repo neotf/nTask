@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.*;
 import org.neojo.downloader.MoraDownloader;
 import org.neojo.entity.MoraMaterialEntity;
 import org.neojo.response.MoraResponse;
@@ -20,12 +21,19 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public class MoraProcessor {
+    private final ExecutorService p;
+    private final ScheduledExecutorService executor;
     private MoraScheduler ms;
     private final int threads;
     private final int label;
     private int no;
+    private boolean running = true;
 
-    public MoraProcessor(int label, int no, int threads) {
+    private MoraProcessor(int label, int no, int threads) {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Mora-Catch-%02d").build();
+        p = new ThreadPoolExecutor(threads, threads, 10L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingDeque<>(1024), threadFactory, new ThreadPoolExecutor.AbortPolicy());
+        executor = Executors.newScheduledThreadPool(2);
         this.threads = threads;
         this.label = label;
         this.no = no;
@@ -33,7 +41,7 @@ public class MoraProcessor {
     }
 
     private void complete() {
-        while (true) {
+        while (running) {
             if (!ms.hasResponse()) {
                 CommonUtils.sleep(100);
                 continue;
@@ -46,10 +54,17 @@ public class MoraProcessor {
     }
 
     private void monitor() {
-        int now = ms.no();
+        int now = ms.getNo();
         int spd = (now - no) / 5;
+        int activeCount = ((ThreadPoolExecutor) p).getActiveCount();
         no = now;
-        log.info("Label:{} - {}/{} Speed: {}/s", label, now, ms.max(), spd);
+        if (activeCount > 0 || ms.hasResponse()) {
+            log.info("Label:{} - {}/{} Speed: {}/s", label, now, ms.getMax(), spd);
+        } else {
+            log.info("Label:{} - {}/{} Speed: {}/s \nTask Complete", label, now, ms.getMax(), spd);
+            running = false;
+            executor.shutdown();
+        }
     }
 
     private void heartbeat() {
@@ -60,25 +75,39 @@ public class MoraProcessor {
     }
 
     public void start() {
-        ThreadFactory listenerThreadFactory = new ThreadFactoryBuilder().setNameFormat("Mora-Catch-%02d").build();
-        ExecutorService p = new ThreadPoolExecutor(threads, threads, 10L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingDeque<>(1024), listenerThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+        log.info("Mora Catch Processor Start, Threads: {}", threads);
         for (int i = 0; i < threads; i++) {
             p.execute(new MoraDownloader(ms));
         }
-
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-        executor.scheduleAtFixedRate(this::monitor, 5, 5, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(this::monitor, 1, 5, TimeUnit.SECONDS);
         executor.scheduleAtFixedRate(this::heartbeat, 1, 1, TimeUnit.SECONDS);
         this.complete();
     }
 
     public static void main(String[] args) {
-        int label = Integer.parseInt(args[0]);
-        int no = Integer.parseInt(args[1]);
-        int threads = Integer.parseInt(args[2]);
-        MoraProcessor mp = new MoraProcessor(label, no, threads);
-        mp.start();
-    }
+        Options options = new Options();
+        options.addRequiredOption("l", "label-id", true, "Mora Label ID");
+        options.addRequiredOption("n", "material-no", true, "Mora MaterialNo");
+        options.addOption("t", true, "number of threads");
 
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            int label = Integer.parseInt(cmd.getOptionValue("l"));
+            int no = Integer.parseInt(cmd.getOptionValue("n"));
+            int threads = cmd.hasOption("t")
+                    ? Integer.parseInt(cmd.getOptionValue("t"))
+                    : Runtime.getRuntime().availableProcessors() * 4;
+
+            MoraProcessor mp = new MoraProcessor(label, no, threads);
+            mp.start();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+        } finally {
+            System.exit(1);
+        }
+    }
 }

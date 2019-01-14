@@ -51,12 +51,12 @@ public class MoraDownloader implements Runnable {
 
     @Override
     public void run() {
-        log.info("Start");
-        CommonUtils.sleep(1000L);
+        CommonUtils.sleep(500);
         while (isRunning) {
             int no = ms.no();
-            if (ms.max() < no) {
-                CommonUtils.sleep(1000L);
+            if (no >= ms.getMax()) {
+                ms.full();
+                stop();
             }
             MoraResponse mr = request(no);
             if (mr.getCode() == HttpURLConnection.HTTP_OK) {
@@ -64,6 +64,12 @@ public class MoraDownloader implements Runnable {
                 ms.max(no + 100000);
             }
             CommonUtils.sleep(100);
+        }
+    }
+
+    private void sleep() {
+        while (isRunning && ms.getNo() >= ms.getMax()) {
+            CommonUtils.sleep(1000);
         }
     }
 
