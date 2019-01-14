@@ -10,32 +10,32 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MoraScheduler {
     private BlockingQueue<MoraResponse> result  = new LinkedBlockingQueue<>();
     private final int label;
-    private int mNo;
-    private int maxNo;
+    private int no;
+    private int max;
 
-    public MoraScheduler(int label,int mNo) {
+    public MoraScheduler(int label,int no) {
         this.label = label;
-        this.mNo = mNo;
-        this.maxNo = mNo + 10000;
+        this.no = no;
+        this.max = no + 100000;
     }
 
     public int getLabel() {
         return label;
     }
 
-    public int getMax() {
-        return maxNo;
+    public int max() {
+        return max;
     }
 
-    public synchronized int getMax(int mno) {
-        if (maxNo < mno) {
-            maxNo = mno;
+    public synchronized int max(int no) {
+        if (max < no) {
+            max = no;
         }
-        return maxNo;
+        return max;
     }
 
-    public synchronized int getNo() {
-        return mNo++;
+    public synchronized int no() {
+        return no++;
     }
 
     public void addResponse(MoraResponse response) {

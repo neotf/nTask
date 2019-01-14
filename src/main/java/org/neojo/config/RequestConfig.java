@@ -12,8 +12,8 @@ import java.util.Map;
  * @date 2018/1/11
  */
 @Getter
-public class RequestConfig<T> {
-    private String              method  = "GET";
+public class RequestConfig {
+    private String method = "GET";
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> cookies = new HashMap<>();
     private String contentType = "text/html; charset=UTF-8";
