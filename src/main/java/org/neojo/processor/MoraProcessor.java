@@ -15,7 +15,6 @@ import org.neojo.util.MoraUtil;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.*;
 
@@ -58,11 +57,11 @@ public class MoraProcessor {
             try {
                 Integer mediaFormatNo = me.getMediaFormatNo();
                 log.info("[{}] : {}[{}] {} - {} {}", res.getId(),
-                        (mediaFormatNo==12||mediaFormatNo==13)?"[Hi-Res]":"",
+                        (mediaFormatNo == 12 || mediaFormatNo == 13) ? "[Hi-Res]" : "",
                         tosdf.format(frsdf.parse(me.getDispStartDate())),
-                        me.getArtistName(), me.getTitle(),  MoraUtil.getMediaFormat(me));
-            } catch (ParseException e) {
-                e.printStackTrace();
+                        me.getArtistName(), me.getTitle(), MoraUtil.getMediaFormat(me));
+            } catch (java.text.ParseException e) {
+                log.error(e.getMessage());
             }
         }
     }
@@ -117,9 +116,10 @@ public class MoraProcessor {
 
             MoraProcessor mp = new MoraProcessor(label, no, threads);
             mp.start();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (ParseException e) {
             formatter.printHelp("utility-name", options);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             System.exit(1);
         }

@@ -20,8 +20,8 @@ public class MoraUtil {
         Integer mediaType = mme.getMediaType();
         Integer samplingFreq = mme.getSamplingFreq();
         String bitPerSample = mme.getBitPerSample();
-        double khz = Double.valueOf(samplingFreq) / 1000;
-        double mhz = Double.valueOf(samplingFreq) / 1000000;
+        double khz = samplingFreq==null?0:Double.valueOf(samplingFreq) / 1000;
+        double mhz = samplingFreq==null?0:Double.valueOf(samplingFreq) / 1000000;
 
         if (mediaFormatNo == null) {
             return mediaFlg == 1 ? "[AAC]" : mediaFlg == 2 ? "[AVC]" : "[AAC/AVC]";
